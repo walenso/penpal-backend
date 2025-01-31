@@ -1,6 +1,6 @@
 service: penpal
 
-frameworkVersion: ">=3.0.0"
+frameworkVersion: "3"
 
 custom:
   stages:
