@@ -1,0 +1,29 @@
+{
+  "name": "penpal-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "serverless offline start",
+    "deploy:dev": "serverless deploy --stage dev",
+    "deploy:prod": "serverless deploy --stage prod",
+    "ssm:set": "./scripts/manage-ssm.sh set",
+    "ssm:get": "./scripts/manage-ssm.sh get"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^5.5.0",
+    "axios": "^1.6.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^12.7.0",
+    "mongoose": "^8.9.5",
+    "nanoid": "^5.0.9",
+    "serverless-http": "^3.2.0",
+    "stripe": "^14.25.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.40.0",
+    "serverless-dotenv-plugin": "^6.0.0",
+    "serverless-offline": "^13.9.0"
+  }
+}

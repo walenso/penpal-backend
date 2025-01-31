@@ -1,0 +1,173 @@
+service: penpal
+
+frameworkVersion: ">=3.0.0"
+
+custom:
+  stages:
+    - dev
+    - qa
+    - prod
+  serverless-offline:
+    httpPort: 5000
+    noPrependStageInUrl: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  profile: penpal-dev
+  environment:
+    STAGE: ${opt:stage, 'dev'}
+    NODE_ENV: ${opt:stage, 'dev'}
+    PORT: 5000
+    MONGO_URI: ${file(./config/${opt:stage, 'dev'}.json):MONGO_URI}
+    FIREBASE_PROJECT_ID: ${file(./config/${opt:stage, 'dev'}.json):FIREBASE_PROJECT_ID}
+    FIREBASE_PRIVATE_KEY: ${file(./config/${opt:stage, 'dev'}.json):FIREBASE_PRIVATE_KEY}
+    FIREBASE_CLIENT_EMAIL: ${file(./config/${opt:stage, 'dev'}.json):FIREBASE_CLIENT_EMAIL}
+    STRIPE_SECRET_KEY: ${file(./config/${opt:stage, 'dev'}.json):STRIPE_SECRET_KEY}
+    STRIPE_WEBHOOK_SECRET: ${file(./config/${opt:stage, 'dev'}.json):STRIPE_WEBHOOK_SECRET}
+    FRONTEND_URL: ${file(./config/${opt:stage, 'dev'}.json):FRONTEND_URL}
+
+functions:
+  api:
+    handler: app.server
+    events:
+      - http:
+          path: /stripe/webhook
+          method: post
+          cors: true
+      # Auth routes
+      - http:
+          path: /auth/login
+          method: POST
+          cors: true
+      - http:
+          path: /auth/register
+          method: POST
+          cors: true
+      - http:
+          path: /auth/user
+          method: GET
+          cors: true
+          
+      # User routes
+      - http:
+          path: /users/sync
+          method: POST
+          cors: true
+          
+      # Referral routes
+      - http:
+          path: /referrals/stats
+          method: GET
+          cors: true
+      - http:
+          path: /referrals/validate
+          method: GET
+          cors: true
+      - http:
+          path: /referrals/stats/{userId}
+          method: GET
+          cors: true
+      - http:
+          path: /referrals
+          method: POST
+          cors: true
+      - http:
+          path: /referrals/leaderboard
+          method: GET
+          cors: true
+          
+      # Stripe Payment routes
+      - http:
+          path: /stripe/create-checkout-session
+          method: POST
+          cors: true
+      - http:
+          path: /stripe/config
+          method: GET
+          cors: true
+      - http:
+          path: /stripe/subscription-details
+          method: GET
+          cors: true
+      - http:
+          path: /stripe/cancel-subscription
+          method: POST
+          cors: true
+          
+      # Stripe Connect & Payout routes
+      - http:
+          path: /stripe/create-connect-account
+          method: POST
+          cors: true
+      - http:
+          path: /stripe/account-status
+          method: GET
+          cors: true
+      - http:
+          path: /stripe/payout-history
+          method: GET
+          cors: true
+      - http:
+          path: /stripe/request-payout
+          method: POST
+          cors: true
+      - http:
+          path: /stripe/update-payment-method
+          method: POST
+          cors: true
+          
+      # Refund routes
+      - http:
+          path: /refunds/process
+          method: POST
+          cors: true
+      - http:
+          path: /refunds/history
+          method: GET
+          cors: true
+      - http:
+          path: /refunds/metrics
+          method: GET
+          cors: true
+      - http:
+          path: /refunds/check-eligibility/{referralId}
+          method: GET
+          cors: true
+      - http:
+          path: /refunds/webhook
+          method: POST
+          cors: true
+          
+      # Custom referral code routes
+      - http:
+          path: /users/{userId}/custom-referral-code
+          method: PUT
+          cors: true
+          
+      # Testing endpoints 
+      - http:
+          path: /test/generate-code
+          method: GET
+          cors: true
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+
+plugins:
+  - serverless-offline
+
+package:
+  patterns:
+    - '!config/${opt:stage, "dev"}.json'
+    - '!.env'
+    - '!.env.*'
+    - '!node_modules/.cache/**'
+    - '!.git/**'

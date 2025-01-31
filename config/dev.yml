@@ -1,0 +1,2 @@
+# config/dev.yml
+NODE_ENV: development

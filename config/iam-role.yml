@@ -1,0 +1,19 @@
+# config/iam-role.yml
+statements:
+  - Effect: Allow
+    Action:
+      - ssm:GetParameter
+      - ssm:GetParameters
+    Resource: 
+      - arn:aws:ssm:${aws:region}:${aws:accountId}:parameter/*
+  - Effect: Allow
+    Action:
+      - cloudformation:DescribeStacks
+    Resource: "*"
+  - Effect: Allow
+    Action:
+      - logs:CreateLogGroup
+      - logs:CreateLogStream
+      - logs:PutLogEvents
+    Resource: 
+      - arn:aws:logs:${aws:region}:${aws:accountId}:log-group:/aws/lambda/penpal-referral-${opt:stage, 'dev'}-*
